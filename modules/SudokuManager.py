@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-from numpy.core.numeric import indices
 
 from modules.DrawInfo import DrawInfo
 import modules.utils as utils
@@ -11,12 +10,12 @@ class SudokuManager:
     as if it were a sudoku puzzle
     Takes an image of the sudoku puzzle; for image manipulation
     '''
-    sudokuPuzzle = None
-    sudokuImage = None
+    sudokuPuzzle = None # 2d array 
+    sudokuImage = None # Sudoku image; 
 
     # x,y,w,h,area
     boundingBoxCoordinates = None
-    coordinateMap = None
+    coordinateMap = None 
 
 
     def __init__(self, puzzle, image):
@@ -194,3 +193,51 @@ class SudokuManager:
 
             #print(truthTable)
             return truthTable
+    
+    def drawNumberAt(self, numberToDraw, coordinates, colour):
+        '''
+        Draws the specified number at the coordinates given
+        Colour is a tuple in BGR format indicating the colour that the number should be
+        '''
+        if self.sudokuPuzzle[coordinates[0], coordinates[1]] == 0:
+            print("Adding number: ", numberToDraw)
+            # Get matching asset
+            numberImage = utils.getNumberImage(numberToDraw, "./assets")
+
+            # Change image colour
+            numberImage = utils.changeTextColour(numberImage, colour)
+            print(f"image shape {numberImage.shape}")
+
+            # Get coordinates to fit in the box
+            drawCoords = self.coordinateMap[coordinates[0], coordinates[1]]
+            x1, y1, x2, y2 = drawCoords.getDrawCoordinates()
+
+            # Calculate the size of the box
+            w = x2 - x1
+            h = y2 - y1
+
+            # Calculate dimensions that the image should be
+            img_w = int(w * 0.50) # 10 percent margin both sides
+            img_h = int(h * 0.50) # 10 percent margin both sides
+
+            # Resize the image
+            numberImage = cv.resize(numberImage, (img_w, img_h))
+
+            # Find the top corner to start from
+            centerOfBox_x = x1 + int(w/2)
+            centerOfBox_y = y1 + int(h/2)
+
+            start_x = centerOfBox_x - int(img_w / 2)
+            start_y = centerOfBox_y - int(img_h / 2)
+            
+            # Add to image
+            self.sudokuImage[start_y:start_y+img_h, start_x:start_x+img_w] = numberImage
+            
+            # Add to puzzle in memory (this might change)
+            self.sudokuPuzzle[coordinates[0], coordinates[1]] = numberToDraw
+
+            # show
+            utils.showAndSave(self.sudokuImage, "Edited sudo", True)
+            print(self.sudokuPuzzle)
+        else:
+            print(f"Cannot place number, theres a(n) {self.sudokuPuzzle[coordinates[0], coordinates[1]]} here!")
