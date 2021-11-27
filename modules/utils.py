@@ -1,5 +1,7 @@
 import cv2 as cv
+import imutils
 import numpy as np
+import os
 
 from modules.DrawInfo import DrawInfo
 from tensorflow.keras.models import load_model
@@ -113,3 +115,61 @@ class Colour(Enum):
     GREEN = (0,255,0)
     YELLOW = (0,255,255)
     FUSHIA = (255, 0, 255)
+
+
+def createNumberAssets(directoryOfImages, savePath):
+    # Loop through the files of a dir
+    dirList = os.listdir(directoryOfImages)
+    print(dirList)
+    # Load the image
+    for dir in dirList:
+        img = cv.imread(directoryOfImages + "/" + dir)
+        img_grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        thresh = cv.threshold(img_grey, 0, 255, cv.THRESH_BINARY_INV | cv.THRESH_OTSU)[1]
+
+        cnts = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        cnts = imutils.grab_contours(cnts)
+
+        digitCnts = []
+        # loop over the digit area candidates
+        for c in cnts:
+	        # compute the bounding box of the contour
+            x, y, w, h = cv.boundingRect(c)
+            
+
+	        # if the contour is sufficiently large, it must be a digit
+            if w >= 15 and (h >= 25 and h <= 45):
+                digitCnts.append(c)
+
+        
+        for d in digitCnts:
+            # extract the digit ROI
+            (x, y, w, h) = cv.boundingRect(d)
+            
+            # Extract image from original and save
+            imgToSave = img[y:y+h, x:x+w]
+            # Save image
+            cv.imwrite(savePath + "/" + dir, imgToSave)
+
+
+def getNumberImage(num, assetPath):
+    # Assumption that the file is a jpg
+    numberImg = cv.imread(assetPath + f"/{num}.JPG")
+
+    return numberImg
+
+def changeTextColour(img, colour):
+    # Load the aerial image and convert to HSV colourspace
+    hsv = cv.cvtColor(img,cv.COLOR_BGR2HSV)
+
+    # Define lower and uppper limits of what we call "black"
+    black_low = np.array([0,0,0])
+    black_high =np.array([190,190,190])
+
+    # Mask image to only select black
+    mask = cv.inRange(hsv, black_low, black_high)
+
+    # Change image to colour where we found black
+    img[mask>0] = colour
+
+    return img
