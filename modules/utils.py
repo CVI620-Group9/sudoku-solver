@@ -32,7 +32,9 @@ def showAndSave(image, imageName, isSaving):
     # Specifically destroy the window of the new image
     cv.destroyWindow(f"{imageName}")
 
-model = load_model('../myModel.h5')
+#model = load_model('D:\CVI620\ProjectStuffs\Sudoku\sudoku-solver\myModel.h5')
+modelPath = os.path.abspath('myModel.h5')
+model = load_model(modelPath)
 
 #Process the Image to gray Color, and and return the Threshold Image
 def processImage(image):
@@ -55,7 +57,7 @@ def biggestContour(contour):
             if area > max_area and len(approx) == 4:
                 biggest = approx
                 max_area = area
-    print(count)
+    #print(count)
     return biggest, max_area
 
 
@@ -101,6 +103,8 @@ def getPredection(boxes,model):
         else:
             output.append(0)
     return output
+
+
 
 def drawRectangle(drawInfoObject, image, colour):
         if isinstance(drawInfoObject, DrawInfo):
