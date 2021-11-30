@@ -1,12 +1,13 @@
 import cv2 as cv
 import numpy as np
 import os
+from modules.SudokuManager import SudokuManager
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import modules.utils as utils
 
 
 if __name__ == "__main__":
-    img = cv.imread("sudoku.jpg")
+    img = cv.imread("sudoku1.jpg")
     imgHeight = 450
     imgWidth = 450
 
@@ -21,10 +22,11 @@ if __name__ == "__main__":
     cv.drawContours(imgContours, contours, -1, (0, 255, 0), 3)
 
     blankImg = np.zeros((imgHeight, imgWidth, 3), np.uint8 )
-
+    
     # Find the bigest contours, and warp it
     biggest, maxArea = utils.biggestContour(contours)
     cv.drawContours(imgBigContours, biggest, -1, (0, 0, 255), 10)
+    print(f"Biggest: {biggest}")
 
     if biggest.size != 0:
         biggest = utils.reorder(biggest)
@@ -34,7 +36,7 @@ if __name__ == "__main__":
         matrix = cv.getPerspectiveTransform(pnts1 + 1, pnts2)
         imgWarpColored = cv.warpPerspective(img, matrix, (imgWidth, imgHeight))
         imgDetectedDigits = blankImg.copy()
-        imgWarpColored = cv.cvtColor(imgWarpColored, cv.COLOR_BGR2GRAY)
+        #imgWarpColored = cv.cvtColor(imgWarpColored, cv.COLOR_BGR2GRAY)
 
     # Split The Digit
     #boxes = utils.splitBoxes(imgWarpColored)
@@ -51,9 +53,17 @@ if __name__ == "__main__":
     #cv.imshow("boxes", boxes[0])
     #cv.waitKey(2000)
 
-    cv.imshow("Sudoko Image", img)
-    cv.imshow("Image warp", imgWarpColored)
-    cv.waitKey(2000)
+    # cv.imshow("Image warp", imgWarpColored)
+    #cv.waitKey(2000)
+
+    # Create sudoku manager
+    # sud = cv.imread('sudoku1.jpg')
+    sudo = SudokuManager(imgWarpColored)
+    sudo.printSudoku()
+    sudo.drawNumberAt(3, [3, 3], utils.Colour.FUSHIA.value)
+    sudo.highlightNonDrawFor(3, "Throwaway", True)
+
+
 
 
 
