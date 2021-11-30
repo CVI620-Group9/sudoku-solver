@@ -60,7 +60,6 @@ def biggestContour(contour):
     #print(count)
     return biggest, max_area
 
-
 # Reorder the The biggest Contour cordinate points
 def reorder(points):
     points = points.reshape((4, 2))
@@ -104,8 +103,27 @@ def getPredection(boxes,model):
             output.append(0)
     return output
 
+def getPredictionForImage(image):
+    
+    ## PREPARE IMAGE
+    img = np.asarray(image)
+    #img = img[4:img.shape[0] - 4, 4:img.shape[1] -4]
+    img = cv.resize(img, (28, 28))
+    img = img / 255
+    img = img.reshape(1, 28, 28, 1)
 
-
+    ## GET PREDICTION
+    predictions = model.predict(img)
+    classIndex = model.predict_classes(img)
+    predictedValue = np.amax(predictions)
+    ## SAVE TO RESULT
+    if predictedValue > 0.7:
+        output = classIndex[0]
+    else:
+        output = 0
+    
+    return output
+    
 def drawRectangle(drawInfoObject, image, colour):
         if isinstance(drawInfoObject, DrawInfo):
             cv.rectangle(image, (drawInfoObject.x1, drawInfoObject.y1), (drawInfoObject.x2, drawInfoObject.y2), colour, 2)
