@@ -18,17 +18,40 @@ class SudokuManager:
     coordinateMap = None 
 
 
-    def __init__(self, puzzle, image):
-        self.sudokuPuzzle = puzzle
+    def __init__(self, image):
         self.sudokuImage = image
 
         # Extract the bounding box locations
         self.boundingBoxCoordinates = self.extractBoundingBoxes()
         self.coordinateMap = self.mapBoundingBoxesToPuzzle(self.boundingBoxCoordinates)
 
+        self.sudokuPuzzle = self.fillPuzzle()
+
     def printSudoku(self):
         print(f'{self.sudokuPuzzle}')
     
+    def fillPuzzle(self):
+        sudoPuzzle = []
+        # Make a copy of the image
+        sudokuImageCopy = self.sudokuImage.copy()
+        sudokuImageCopy = cv.cvtColor(sudokuImageCopy, cv.COLOR_BGR2GRAY)
+        # Iterate over image and slice out number to make a prediction on
+        for dInfoRow in self.coordinateMap:
+            sudoRow = []
+            for dio in dInfoRow:
+                x1, y1, x2, y2 = dio.getDrawCoordinates()
+                # Get slice of number
+                numSlice = sudokuImageCopy[y1:y2, x1:x2]
+                prediction = utils.getPredictionForImage(numSlice)
+                sudoRow.append(prediction)
+            
+            sudoPuzzle.append(sudoRow)
+        
+        sudoToReturn = np.array(sudoPuzzle)
+
+        return sudoToReturn
+
+
     def extractBoundingBoxes(self):
         '''
         Source of this god-send code
@@ -39,9 +62,9 @@ class SudokuManager:
         # Convert to grayscale and apply a threshold setting each pixel to ON or OFF based on
         # a threshold number
         gray_scale = cv.cvtColor(self.sudokuImage, cv.COLOR_BGR2GRAY)
-        th, img_bin = cv.threshold(gray_scale, 150, 225, cv.THRESH_BINARY)
+        th, img_bin = cv.threshold(gray_scale, 200, 240, cv.THRESH_BINARY)
         img_bin =~ img_bin
-
+        
         # This is to avoid the detection of False Positives in text
         line_min_width = 15
         kernal_h = np.ones((1, line_min_width), np.uint8)
@@ -63,19 +86,29 @@ class SudokuManager:
         # Detect the bounding boxes in the image
         _, labels, stats, _ = cv.connectedComponentsWithStats(~img_bin_final, connectivity=8, ltype=cv.CV_32S)
 
-        stats = stats[2:]
+        stats = stats[1:]
         # Remove the outlier data points
         # Simple outlier removal; order by area, take the last 81 elements
         # Order by area 
         stats = stats[stats[:, 4].argsort()]
-
+        
         # Take the last 81 elements
         stats = stats[-81:, :]
-
-        # Sort by x coordinates then by y
-        stats = stats[np.lexsort((stats[:,0], stats[:,1]))]
-
-        return stats
+        
+        statsToReturn = []
+        # sort on y
+        stats = stats[stats[:, 1].argsort()]
+        step = 9
+        for i in range(0, 81, step):
+            # slice out set of 9
+            stat_slice = stats[i:i+step, :]
+            # sort on x
+            stat_slice = stat_slice[stat_slice[:, 0].argsort()]
+            statsToReturn.extend(stat_slice)
+        
+        statsToReturn = np.array(statsToReturn)
+        
+        return statsToReturn
 
     def mapBoundingBoxesToPuzzle(self, boundingBoxes):
         '''
