@@ -1,8 +1,11 @@
 import cv2 as cv
 import numpy as np
+import copy
 
 from modules.DrawInfo import DrawInfo
 import modules.utils as utils
+
+from modules.SolutionManager import loop_basic_rule, loop_algorithm, check_box_eliminate_others
 
 class SudokuManager:
     '''
@@ -11,7 +14,8 @@ class SudokuManager:
     Takes an image of the sudoku puzzle; for image manipulation
     '''
     sudokuPuzzle = None # 2d array 
-    sudokuImage = None # Sudoku image; 
+    sudokuImage = None # Sudoku image;
+    possible_value = {} #array for the possible values of each box in the puzzle
 
     # x,y,w,h,area
     boundingBoxCoordinates = None
@@ -26,6 +30,17 @@ class SudokuManager:
         self.coordinateMap = self.mapBoundingBoxesToPuzzle(self.boundingBoxCoordinates)
 
         self.sudokuPuzzle = self.fillPuzzle()
+
+        # initialize list of possible values
+        for i in range(1, 10):
+            for j in range(1, 10):
+                self.possible_value[i, j] = list(range(1, 10))
+
+        # remove list from filled spaces
+        for i in range(1, 10):
+            for j in range(1, 10):
+                if self.sudokuPuzzle[i - 1][j - 1] != 0:
+                    self.possible_value[i, j] = []
 
     def printSudoku(self):
         print(f'{self.sudokuPuzzle}')
@@ -274,3 +289,21 @@ class SudokuManager:
             print(self.sudokuPuzzle)
         else:
             print(f"Cannot place number, theres a(n) {self.sudokuPuzzle[coordinates[0], coordinates[1]]} here!")
+
+    def solveSudoku(self):
+
+        while True:
+            checker = True
+            # make copy of the current iteration of the puzzle
+            puzzle_old = copy.deepcopy(self.sudokuPuzzle)
+            loop_basic_rule(self.possible_value, self.sudokuPuzzle)
+            loop_algorithm(self.possible_value, self.sudokuPuzzle)
+            check_box_eliminate_others(self.possible_value)
+            for i in range(1, 10):
+                for j in range(1, 10):
+                    if self.sudokuPuzzle[i - 1][j - 1] == puzzle_old[i - 1][j - 1]:
+                        checker = False
+            if not checker:
+                break
+
+        print("puzzle solved")

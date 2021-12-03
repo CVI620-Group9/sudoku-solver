@@ -114,7 +114,7 @@ def getPredictionForImage(image):
 
     ## GET PREDICTION
     predictions = model.predict(img)
-    classIndex = model.predict_classes(img)
+    classIndex = np.argmax(model.predict(img), -1)
     predictedValue = np.amax(predictions)
     ## SAVE TO RESULT
     if predictedValue > 0.7:
