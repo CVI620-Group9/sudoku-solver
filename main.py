@@ -63,3 +63,10 @@ if __name__ == "__main__":
     # sudo.highlightNonDrawFor(3, "Throwaway", True)
     sudo.solveSudoku()
     sudo.printSudoku()
+
+    cv.imshow("Result", sudo.sudokuImage)
+    # wait 10 seconds
+    cv.waitKey(10000)
+
+    # Specifically destroy the window of the new image
+    cv.destroyWindow("Result", sudo.sudokuImage)
