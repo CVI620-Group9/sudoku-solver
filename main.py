@@ -69,4 +69,4 @@ if __name__ == "__main__":
     cv.waitKey(10000)
 
     # Specifically destroy the window of the new image
-    cv.destroyWindow("Result", sudo.sudokuImage)
+    cv.destroyWindow("Result")
