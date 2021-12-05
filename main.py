@@ -1,13 +1,14 @@
 import cv2 as cv
 import numpy as np
 import os
+import sys
 from modules.SudokuManager import SudokuManager
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import modules.utils as utils
 
 if __name__ == "__main__":
-    img = cv.imread("sudoku1.jpg")
+    img = cv.imread(sys.argv[1])
     imgHeight = 450
     imgWidth = 450
 
