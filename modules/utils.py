@@ -153,19 +153,20 @@ def createNumberAssets(directoryOfImages, savePath):
         cnts = imutils.grab_contours(cnts)
 
         digitCnts = []
-        # loop over the digit area candidates
+        # loop over the candidates
         for c in cnts:
-	        # compute the bounding box of the contour
+	        # determine the bounding box of the contour
             x, y, w, h = cv.boundingRect(c)
             
 
-	        # if the contour is sufficiently large, it must be a digit
+	        # if the contour is large enough, it must be a digit
+            # number should be only contour in the image since the tiles are numbers with white background
             if w >= 15 and (h >= 25 and h <= 45):
                 digitCnts.append(c)
 
         
         for d in digitCnts:
-            # extract the digit ROI
+            # extract the bounding box immediately around the number
             (x, y, w, h) = cv.boundingRect(d)
             
             # Extract image from original and save

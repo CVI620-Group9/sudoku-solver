@@ -66,7 +66,7 @@ class SudokuManager:
 
     def extractBoundingBoxes(self):
         '''
-        Source of this god-send code
+        Source of this code
         https://towardsdatascience.com/checkbox-table-cell-detection-using-opencv-python-332c57d25171
         '''
 
