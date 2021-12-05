@@ -27,7 +27,7 @@ def showAndSave(image, imageName, isSaving):
     cv.imshow(f"{imageName}", image)
 
     # wait 1 second
-    cv.waitKey(500)
+    cv.waitKey(2000)
 
     # Specifically destroy the window of the new image
     cv.destroyWindow(f"{imageName}")
