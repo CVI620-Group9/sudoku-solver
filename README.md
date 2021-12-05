@@ -11,3 +11,6 @@ OpenCV application to solve sudoku puzzles based on an image of the puzzle
 
 ## Run code
 ```python main.py sudoku.jpg```
+
+## Note:
+Code takes a long time to execute since it displays every step towards solving the puzzle
