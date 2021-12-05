@@ -1,8 +1,3 @@
-
-
-from numpy import False_
-
-
 class DrawInfo:
     x1 = None
     y1 = None
