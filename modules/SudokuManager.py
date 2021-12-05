@@ -246,7 +246,7 @@ class SudokuManager:
 
             # Change image colour
             numberImage = utils.changeTextColour(numberImage, colour)
-            print(f"image shape {numberImage.shape}")
+            #print(f"image shape {numberImage.shape}")
 
             # Get coordinates to fit in the box
             drawCoords = self.coordinateMap[coordinates[0], coordinates[1]]
