@@ -36,31 +36,10 @@ if __name__ == "__main__":
         matrix = cv.getPerspectiveTransform(pnts1 + 1, pnts2)
         imgWarpColored = cv.warpPerspective(img, matrix, (imgWidth, imgHeight))
         imgDetectedDigits = blankImg.copy()
-        # imgWarpColored = cv.cvtColor(imgWarpColored, cv.COLOR_BGR2GRAY)
-
-    # Split The Digit
-    # boxes = utils.splitBoxes(imgWarpColored)
-
-    # numbers = utils.getPredection(boxes, utils.model)
-    # print(numbers)
-
-    # cv.imshow("Sudoko Image", img)
-    # cv.imshow("Threshold Image", imgThres)
-    # cv.imshow("All Image Contours", imgContours)
-    # cv.imshow("biggest Countour Points", imgBigContours)
-    # cv.imshow("Image warp", imgWarpColored)
-    # cv.imshow("boxes", boxes[0])
-    # cv.waitKey(2000)
-
-    # cv.imshow("Image warp", imgWarpColored)
-    # cv.waitKey(2000)
+        
 
     # Create sudoku manager
-    # sud = cv.imread('sudoku1.jpg')
     sudo = SudokuManager(imgWarpColored)
-    # sudo.printSudoku()
-    # sudo.drawNumberAt(3, [3, 3], utils.Colour.FUSHIA.value)
-    # sudo.highlightNonDrawFor(3, "Throwaway", True)
     sudo.solveSudoku()
     sudo.printSudoku()
 
